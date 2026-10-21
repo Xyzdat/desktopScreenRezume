@@ -13,9 +13,9 @@ type FolderPositions = Record<FolderId, FolderPosition>;
 const defaultPositions: FolderPositions = {
     experience: { x: 40, y: 100 },
     projects: { x: 180, y: 100 },
-    education: { x: 300, y: 100 },
-    skills: { x: 480, y: 100 },
-    contacts: { x: 560, y: 100 },
+    education: { x: 320, y: 100 },
+    skills: { x: 460, y: 100 },
+    contacts: { x: 600, y: 100 },
 };
 
 
