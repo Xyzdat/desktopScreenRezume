@@ -52,6 +52,7 @@ const MainPage: React.FC = () => {
         id: FolderId,
         event: React.PointerEvent<HTMLButtonElement>
     ) => {
+        if (window.matchMedia('(max-width: 600px)').matches) return;
         if (event.pointerType === "mouse" && event.button !== 0) return 
 
         const folderRect = event.currentTarget.getBoundingClientRect();
