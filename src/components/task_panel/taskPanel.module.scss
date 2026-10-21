@@ -1,0 +1,123 @@
+// .container {
+//     display: flex;
+//     justify-content: center;
+//     width: 100%;
+
+//     &__panel {
+//         width: 500px;
+//         background-color: #000;
+//         opacity: 50%;
+//         border-radius: 20px;
+//         height: 80px;
+//         margin-bottom: 10px;
+//     }
+    
+// }
+
+.taskbar {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+
+    width: min(500px, calc(100vw - 32px));
+    height: 80px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+
+    // Liquid Glass
+    background: rgba(255, 255, 255, 0.16);
+
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 26px;
+
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+
+    z-index: 900;
+
+    // Мягкий блик вдоль верхней части панели
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+
+        border-radius: inherit;
+        pointer-events: none;
+
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.22) 0%,
+            rgba(255, 255, 255, 0.05) 35%,
+            transparent 70%
+        );
+    }
+
+    &__item {
+        display: grid;
+        place-items: center;
+        position: relative;
+        z-index: 1;
+
+        flex: 0 0 54px;
+        width: 54px;
+        height: 54px;
+
+        border-radius: 16px;
+
+        padding: 0;
+        color: #242424;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform 160ms ease, background 160ms ease;
+
+        &:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        &:focus-visible {
+            outline: 2px solid #3478f6;
+            outline-offset: 3px;
+        }
+
+        svg {
+            width: 27px;
+            height: 27px;
+            stroke-width: 1.8;
+        }
+    }
+}
+
+.notes {
+    display: block;
+    width: 100%;
+    min-height: 240px;
+    box-sizing: border-box;
+    padding: 16px;
+    resize: vertical;
+    border: 1px solid rgba(60, 60, 67, 0.18);
+    border-radius: 12px;
+    color: #1c1c1e;
+    background: #fffdf3;
+    font: inherit;
+    line-height: 1.5;
+
+    &:focus-visible {
+        outline: 2px solid #3478f6;
+        outline-offset: 2px;
+    }
+}

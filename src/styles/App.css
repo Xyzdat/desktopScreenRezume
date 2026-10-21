@@ -1,0 +1,21 @@
+.portfolio-container {
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 16% 12%, rgba(255, 255, 255, 0.78) 0%, transparent 38%),
+    radial-gradient(ellipse at 84% 20%, rgba(157, 190, 255, 0.64) 0%, transparent 42%),
+    radial-gradient(ellipse at 76% 88%, rgba(250, 184, 209, 0.68) 0%, transparent 46%),
+    linear-gradient(135deg, #dcecff 0%, #e9e4ff 48%, #f9e6ef 100%);
+  background-attachment: fixed;
+}
+
+.background {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+}
