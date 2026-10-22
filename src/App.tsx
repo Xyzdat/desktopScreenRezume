@@ -6,7 +6,7 @@ import BackgroundScene from './components/backgroundScene/backgroundScene'
 function App() {
   return (
     <div className='portfolio-container'>
-      {/* <BackgroundScene /> */}
+      <BackgroundScene />
       <main>
         < MainPage />
         < TaskPanel />
