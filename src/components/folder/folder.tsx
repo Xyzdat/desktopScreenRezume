@@ -4,7 +4,7 @@ import stlyes from "./folder.module.scss"
 interface FolderProps {
   name?: string,
   style?: React.CSSProperties, 
-  onClick?: React.MouseEventHandler<HTMLButtonElement>,
+  onDoubleClick?: React.MouseEventHandler<HTMLButtonElement>,
   onPointerDown?: React.PointerEventHandler<HTMLButtonElement>,
   onPointerMove?: React.PointerEventHandler<HTMLButtonElement>,
   onPointerUp?: React.PointerEventHandler<HTMLButtonElement>,
@@ -14,7 +14,7 @@ interface FolderProps {
 const Folder: React.FC<FolderProps> = ({ 
   name = 'Folder', 
   style,
-  onClick, 
+  onDoubleClick,
   onPointerDown,
   onPointerMove,
   onPointerUp,
@@ -24,7 +24,7 @@ const Folder: React.FC<FolderProps> = ({
     <button className={stlyes.folder}  
       type="button"
       style = {style}
-      onClick={onClick}
+      onDoubleClick={onDoubleClick}
       onPointerDown = {onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}

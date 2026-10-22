@@ -5,6 +5,7 @@
   gap: 8px;
   position: absolute;
   touch-action: none;
+  pointer-events: auto;
 
   width: 100px;
   padding: 0;
@@ -17,11 +18,43 @@
 
   cursor: pointer;
   user-select: none;
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.25, 1);
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-7px) scale(1.035);
+
+    .folder__icon {
+      filter: brightness(1.08) saturate(1.1);
+    }
+
+    // .folder__body {
+    //   box-shadow:
+    //     inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    //     0 10px 18px rgba(15, 83, 160, 0.28),
+    //     0 0 0 5px rgba(188, 222, 255, 0.28);
+    // }
+
+    .folder__name {
+      text-shadow: 0 1px 8px rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  &:active {
+    transform: translateY(-2px) scale(0.98);
+    transition-duration: 90ms;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(48, 126, 225, 0.85);
+    outline-offset: 5px;
+  }
 
   &__icon {
     position: relative;
     width: 80px;
     height: 58px;
+    transition: filter 220ms ease;
   }
 
   &__tab {
@@ -53,6 +86,7 @@
     box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.4),
       0 2px 4px rgba(0, 0, 0, 0.12);
+    transition: box-shadow 220ms ease;
   }
 
   &__name {
@@ -61,5 +95,21 @@
     line-height: 1.4;
     text-align: center;
     overflow-wrap: anywhere;
+    transition: text-shadow 220ms ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .folder,
+  .folder__icon,
+  .folder__body,
+  .folder__name {
+    transition: none;
+  }
+
+  .folder:hover,
+  .folder:focus-visible,
+  .folder:active {
+    transform: none;
   }
 }

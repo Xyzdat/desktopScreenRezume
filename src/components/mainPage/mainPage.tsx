@@ -10,6 +10,20 @@ const FOLDER_HEIGHT = 90;
 type FolderId = 'experience' | 'projects' | 'education' | 'skills' | 'contacts';
 type FolderPosition = { x: number; y: number };
 type FolderPositions = Record<FolderId, FolderPosition>;
+type DesktopWindow = {
+    id: FolderId;
+    animationOrigin: FolderPosition;
+    initialPosition: FolderPosition;
+    zIndex: number;
+};
+
+const windowTitles: Record<FolderId, string> = {
+    experience: 'Опыт работы',
+    projects: 'Пет проекты',
+    education: 'Образование',
+    skills: 'Технический стэк',
+    contacts: 'Контакты',
+};
 
 const defaultPositions: FolderPositions = {
     experience: { x: 40, y: 100 },
@@ -22,10 +36,10 @@ const defaultPositions: FolderPositions = {
 
 const MainPage: React.FC = () => {
 
-    const [openWindow, setOpenWindow] = useState<FolderId | null>(null);
-    const [animationOrigin, setAnimationOrigin] = useState<{ x: number; y: number } | null>(null);
+    const [openWindows, setOpenWindows] = useState<DesktopWindow[]>([]);
 
     const desktopRef = useRef<HTMLDivElement>(null);
+    const nextWindowZIndex = useRef(1000);
 
     const [positions, setPositions] = useState<FolderPositions>(() => {
         try {
@@ -44,10 +58,7 @@ const MainPage: React.FC = () => {
     const dragState = useRef<{
         id: FolderId;
         offset: FolderPosition;
-        startPosition: FolderPosition;
-        didMove: boolean;
     } | null>(null);
-    const suppressClick = useRef<FolderId | null>(null);
 
     const handlePointerDown = (
         id: FolderId,
@@ -63,7 +74,7 @@ const MainPage: React.FC = () => {
             y: event.clientY - folderRect.top,
         }
 
-        dragState.current = { id, offset, startPosition: positions[id], didMove: false };
+        dragState.current = { id, offset };
 
         event.currentTarget.setPointerCapture(event.pointerId);
     };
@@ -86,9 +97,6 @@ const MainPage: React.FC = () => {
         const x = Math.max(0, Math.min(nextX, maxX));
         const y = Math.max(0, Math.min(nextY, maxY));
 
-        if (Math.abs(x - drag.startPosition.x) > 3 || Math.abs(y - drag.startPosition.y) > 3) {
-            drag.didMove = true;
-        }
         setPositions((current) => ({ ...current, [id]: { x, y } }));
     };
 
@@ -96,22 +104,40 @@ const MainPage: React.FC = () => {
         const drag = dragState.current;
         if (!drag || drag.id !== id) return;
 
-        if (drag.didMove) {
-            suppressClick.current = id;
-        }
         dragState.current = null;
     }
 
-    const handleClick = (id: FolderId, event: React.MouseEvent<HTMLButtonElement>) => {
-        if (suppressClick.current === id) {
-            suppressClick.current = null;
-            return;
-        }
-
+    const handleDoubleClick = (id: FolderId, event: React.MouseEvent<HTMLButtonElement>) => {
         const rect = event.currentTarget.getBoundingClientRect();
-        setAnimationOrigin({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
-        setOpenWindow(id);
+        const zIndex = ++nextWindowZIndex.current;
+
+        setOpenWindows((current) => {
+            const alreadyOpen = current.some((windowData) => windowData.id === id);
+            if (alreadyOpen) {
+                return current.map((windowData) => windowData.id === id ? { ...windowData, zIndex } : windowData);
+            }
+
+            const x = Math.max(24, Math.min(rect.left + 20, window.innerWidth - 624));
+            const y = Math.max(24, Math.min(rect.top + 20, window.innerHeight - 320));
+            return [...current, {
+                id,
+                zIndex,
+                animationOrigin: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+                initialPosition: { x, y },
+            }];
+        });
     }
+
+    const bringWindowToFront = (id: FolderId) => {
+        const zIndex = ++nextWindowZIndex.current;
+        setOpenWindows((current) => current.map((windowData) => (
+            windowData.id === id ? { ...windowData, zIndex } : windowData
+        )));
+    };
+
+    const closeWindow = (id: FolderId) => {
+        setOpenWindows((current) => current.filter((windowData) => windowData.id !== id));
+    };
 
     const renderFolder = (id: FolderId, name: string) => (
         <Folder
@@ -124,7 +150,7 @@ const MainPage: React.FC = () => {
                 touchAction: "none",
                 cursor: dragState.current?.id === id ? "grabbing" : "grab",
             }}
-            onClick={(event) => handleClick(id, event)}
+            onDoubleClick={(event) => handleDoubleClick(id, event)}
             onPointerDown={(event) => handlePointerDown(id, event)}
             onPointerMove={(event) => handlePointerMove(id, event)}
             onPointerUp={() => handlePointerUp(id)}
@@ -141,22 +167,19 @@ const MainPage: React.FC = () => {
             {renderFolder('skills', 'Технический стэк')}
             {renderFolder('contacts', 'Контакты')}
 
+            {openWindows.map((windowData) => (
             <Modal
-                isOpen={openWindow !== null}
-                title={openWindow === 'projects' 
-                    ? 'Пет проекты' 
-                    : openWindow === 'education' 
-                        ? 'Образование' 
-                        : openWindow === 'experience' 
-                            ? 'Опыт работы'
-                            : openWindow === 'skills'
-                                ? 'Технический стэк'
-                                : 'Контакты' 
-                }
-                animationOrigin={animationOrigin}
-                onClose={() => setOpenWindow(null)}
+                key={windowData.id}
+                isOpen
+                title={windowTitles[windowData.id]}
+                animationOrigin={windowData.animationOrigin}
+                initialPosition={windowData.initialPosition}
+                zIndex={windowData.zIndex}
+                isActive={windowData.zIndex === Math.max(...openWindows.map((item) => item.zIndex))}
+                onBringToFront={() => bringWindowToFront(windowData.id)}
+                onClose={() => closeWindow(windowData.id)}
             >
-                {openWindow === 'education' ? (
+                {windowData.id === 'education' ? (
                     <article className={mainPageStyle.experience}>
                         <h3 className={mainPageStyle.experience__role}>{education.university}</h3>
                         <p className={mainPageStyle.experience__company}>{education.faculty}</p>
@@ -179,7 +202,7 @@ const MainPage: React.FC = () => {
                             </div>
                         </dl>
                     </article>
-                ) : openWindow === 'projects' ? (
+                ) : windowData.id === 'projects' ? (
                     <div className={mainPageStyle.experienceList}>
                         {projects.map((project) => (
                             <article className={mainPageStyle.experience} key={project.id}>
@@ -210,7 +233,7 @@ const MainPage: React.FC = () => {
                             </article>
                         ))}
                     </div>
-                ) : openWindow === 'experience' ? (
+                ) : windowData.id === 'experience' ? (
                 <div className={mainPageStyle.experienceList}>
                     {experience.map((item) => (
                         <article className={mainPageStyle.experience} key={item.id}>
@@ -243,7 +266,7 @@ const MainPage: React.FC = () => {
                         </article>
                     ))}
                 </div>
-                ) : openWindow === 'contacts' ? (
+                ) : windowData.id === 'contacts' ? (
                     <section className={mainPageStyle.experienceList}>
                         <h3 className={mainPageStyle.experience__role}>{personalInfo.name}</h3>
                         <p className={mainPageStyle.experience__company}>{personalInfo.title}</p>
@@ -263,7 +286,7 @@ const MainPage: React.FC = () => {
                             );
                         })}
                     </section>
-                ) : openWindow === 'skills' ? (
+                ) : windowData.id === 'skills' ? (
                     <div className={mainPageStyle.experienceListSkills}>
                         {Object.entries(skills).map(([category, items]) => {
                             const labels: Record<string, string> = {
@@ -288,6 +311,7 @@ const MainPage: React.FC = () => {
                 ) : null
                 }
             </Modal>
+            ))}
         </div> 
     );
 

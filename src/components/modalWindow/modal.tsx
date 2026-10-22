@@ -1,23 +1,46 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styles from './modal.module.scss';
 
+type WindowPosition = { x: number; y: number };
+
 interface ModalProps {
   isOpen: boolean;
   title: string;
   onClose: () => void;
+  onBringToFront?: () => void;
+  isActive?: boolean;
+  zIndex?: number;
+  initialPosition?: WindowPosition;
   children: React.ReactNode;
   animationOrigin?: { x: number; y: number } | null;
 }
 
 const ANIMATION_DURATION = 260;
+const VIEWPORT_GAP = 24;
 
-const Modal = ({ isOpen, title, onClose, children, animationOrigin }: ModalProps) => {
+const Modal = ({
+  isOpen,
+  title,
+  onClose,
+  onBringToFront = () => {},
+  isActive = true,
+  zIndex = 1000,
+  initialPosition,
+  children,
+  animationOrigin,
+}: ModalProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [isRendered, setIsRendered] = useState(isOpen);
   const [isClosing, setIsClosing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [position, setPosition] = useState<WindowPosition>(() => initialPosition ?? {
+    x: Math.max(VIEWPORT_GAP, (window.innerWidth - 600) / 2),
+    y: Math.max(VIEWPORT_GAP, (window.innerHeight - 400) / 2),
+  });
   const modalRef = useRef<HTMLElement>(null);
   const closeTimer = useRef<number | null>(null);
+  const dragState = useRef<{ pointerId: number; offset: WindowPosition } | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -55,34 +78,67 @@ const Modal = ({ isOpen, title, onClose, children, animationOrigin }: ModalProps
   };
 
   useEffect(() => {
-    if (!isOpen || !isRendered) return;
+    if (!isOpen || !isRendered || !isActive) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handleClose();
-      }
+      if (event.key === 'Escape') handleClose();
     };
 
     window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isRendered, isActive]);
 
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+  const handleHeaderPointerDown = (event: React.PointerEvent<HTMLElement>) => {
+    if (isMaximized || (event.target as HTMLElement).closest('button') || !modalRef.current) return;
+
+    const rect = modalRef.current.getBoundingClientRect();
+    dragState.current = {
+      pointerId: event.pointerId,
+      offset: { x: event.clientX - rect.left, y: event.clientY - rect.top },
     };
-  }, [isOpen, isRendered, handleClose]);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setIsDragging(true);
+  };
+
+  const handleHeaderPointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    const drag = dragState.current;
+    const modalElement = modalRef.current;
+    if (!drag || drag.pointerId !== event.pointerId || !modalElement) return;
+
+    const rect = modalElement.getBoundingClientRect();
+    const maxX = Math.max(VIEWPORT_GAP, window.innerWidth - rect.width - VIEWPORT_GAP);
+    const maxY = Math.max(VIEWPORT_GAP, window.innerHeight - rect.height - VIEWPORT_GAP);
+    setPosition({
+      x: Math.max(VIEWPORT_GAP, Math.min(event.clientX - drag.offset.x, maxX)),
+      y: Math.max(VIEWPORT_GAP, Math.min(event.clientY - drag.offset.y, maxY)),
+    });
+  };
+
+  const handleHeaderPointerUp = (event: React.PointerEvent<HTMLElement>) => {
+    if (dragState.current?.pointerId !== event.pointerId) return;
+    dragState.current = null;
+    setIsDragging(false);
+  };
 
   if (!isRendered) return null;
 
   return (
-    <div className={`${styles.modal_overlay} ${isClosing ? styles.modal_overlay_closing : ''}`} onClick={handleClose}>
+    <div className={`${styles.modal_overlay} ${isClosing ? styles.modal_overlay_closing : ''}`} style={{ zIndex }}>
       <section
         ref={modalRef}
-        className={`${styles.modal} ${isMaximized ? styles.modal_maximized : ''} ${isMinimized ? styles.modal_minimized : ''} ${isClosing ? styles.modal_closing : styles.modal_enter}`}
+        className={`${styles.modal} ${isMaximized ? styles.modal_maximized : ''} ${isMinimized ? styles.modal_minimized : ''} ${isDragging ? styles.modal_dragging : ''} ${isClosing ? styles.modal_closing : styles.modal_enter}`}
+        style={{ left: position.x, top: position.y }}
         role="dialog"
-        aria-modal="true"
         aria-label={title}
-        onClick={(event) => event.stopPropagation()}
+        onPointerDown={onBringToFront}
       >
-        <header className={styles.modal__header}>
+        <header
+          className={styles.modal__header}
+          onPointerDown={handleHeaderPointerDown}
+          onPointerMove={handleHeaderPointerMove}
+          onPointerUp={handleHeaderPointerUp}
+          onPointerCancel={handleHeaderPointerUp}
+        >
           <div className={styles.modal__controls} aria-label="Кнопки управления окном">
             <button className={`${styles.modal__control} ${styles.modal__control_close}`} type="button" aria-label="Закрыть окно" title="Закрыть" onClick={handleClose}>
               <span aria-hidden="true">×</span>
