@@ -1,0 +1,23 @@
+.character {
+    position: fixed;
+    right: 5%;
+    bottom: 0;
+
+    width: clamp(180px, 25vw, 320px);
+    height: auto;
+
+    color: rgba(35, 35, 35, 0.7);
+
+    pointer-events: none;
+    user-select: none;
+
+    z-index: 0;
+
+    &__drawing {
+        display: block;
+        width: 100%;
+        height: auto;
+
+        overflow: visible;
+    }
+}

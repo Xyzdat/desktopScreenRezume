@@ -3,6 +3,7 @@ import { education, experience, projects, skills, personalInfo } from "../../dat
 import mainPageStyle from "./mainPage.module.scss"
 import Folder from "../folder/folder.tsx";
 import Modal from "../modalWindow/modal.tsx";
+import BackgroundCharacter from "../backgroundCharacter/backgroundCharacter.tsx";
 
 const FOLDER_WIDTH = 100;
 const FOLDER_HEIGHT = 90;
@@ -133,6 +134,7 @@ const MainPage: React.FC = () => {
 
     return (
         <div className={mainPageStyle.container} ref={desktopRef}>
+            <BackgroundCharacter />
             {renderFolder('experience', 'Опыт работы')}
             {renderFolder('projects', 'Пет проекты')}
             {renderFolder('education', 'Образование')}
