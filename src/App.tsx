@@ -5,7 +5,7 @@ import BackgroundScene from './components/backgroundScene/backgroundScene'
 import Header from './components/header/header'
 import { useState } from 'react'
 
-type HeaderItemId =
+export type HeaderItemId =
   | 'experience'
   | 'projects'
   | 'education'
