@@ -1,5 +1,6 @@
 import styles from './header.module.scss'
 import type { HeaderItemId } from '../../App.tsx';
+import { useEffect, useState } from 'react';
 
 
 type HeaderProps = {
@@ -16,11 +17,85 @@ const items: {id: HeaderItemId, title: string}[] = [
 
 
 const Header = ({onItemClick}: HeaderProps) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const closeMenu = () => setIsMenuOpen(false);
+
+    const handleItemClick = (id: HeaderItemId) => {
+        onItemClick(id);
+        closeMenu();
+    }
+
+    useEffect(() => {
+        const handleClose = (event: PointerEvent) => {
+            if (event.target === event.currentTarget) {
+                closeMenu();
+            }
+
+            window.addEventListener('keydown', handleClose);
+
+            return () => {
+                window.removeEventListener('keydown', handleClose);
+            };
+        }
+    }, [])
+
     return (
         <div className={styles.header}>
-            {items.map((item) => (
-                <button className={styles.header__item} key={item.id} onClick={() => onItemClick(item.id)}>{item.title}</button>
-            )) }
+
+            
+            <div className={styles.header__desktop}>
+                {items.map((item) => (
+                    <button className={styles.header__item} key={item.id} onClick={() => onItemClick(item.id)}>{item.title}</button>
+                )) }
+            </div>
+
+            <div className={styles.header__mobile}>
+                
+
+                <a href="/" className={styles.header__logo} onClick={closeMenu}> Artem.me </a>
+
+
+                <div className={styles.header__left}>
+                    <button
+                        type="button"
+                        className={`${styles.header__burger} ${
+                        isMenuOpen ? styles['header__burger--open'] : ''
+                        }`}
+                        aria-label={isMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+                        aria-expanded={isMenuOpen}
+                        aria-controls="header-dropdown"
+                        onClick={() => setIsMenuOpen((prev) => !prev)}
+                    >
+                        <span />
+                        <span />
+                        <span />
+                    </button>
+                
+                        <>
+                        <nav
+                            id="header-dropdown"
+                            className={`${styles.header__dropdown} ${
+                                isMenuOpen ? styles['header__dropdown--open'] : ''
+                            }`}
+                            aria-label="Навигация по странице"
+                        >
+                            {items.map((item) => (
+                            <button
+                                type="button"
+                                className={styles.header__item}
+                                key={item.id}
+                                onClick={() => handleItemClick(item.id)}
+                            >
+                                {item.title}
+                            </button>
+                            ))}
+                        </nav>
+                        </>
+                   
+                    
+                </div>
+            </div>            
+        
         </div>
     )
 }

@@ -36,7 +36,6 @@
                 width 2000ms cubic-bezier(0.22, 1, 0.36, 1),
                 height 2000ms cubic-bezier(0.22, 1, 0.36, 1),;
 
-    
     // Мягкий блик вдоль верхней части панели
     &::before {
         content: "";
@@ -89,6 +88,181 @@
 
     }
 
+    &__logo {
+        display: none;
+    }
+
+    &__mobile {
+        display: none;
+    }
+
+    &__desktop {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+    }
+
+    
+
+}
+
+@media (max-width: 700px) {
+    .header {
+        justify-content: initial;
+        width: calc(100vw - 20px);
+        min-height: 60px;
+        box-sizing: border-box;
+        justify-content: initial;
+
+        &__mobile {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            min-width: 0;
+        }
+
+        &__dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            left: auto;
+            z-index: 1001;
+
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+
+            // Почти вся ширина экрана, по 10px от краёв
+            width: calc(100vw - 20px);
+            box-sizing: border-box;
+
+            // Внутренние отступы
+            padding: 10px;
+
+            background: rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 26px;
+
+            opacity: 0;
+            visibility:hidden;
+            pointer-events: none;
+            transform: translateY(-8px) scale(0.98);
+            transform-origin: top right;
+
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.45),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+
+            transition: 400ms cubic-bezier(0.25, 0.82, 0.2, 1);
+            
+            &--open {
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+                transform: translateY(0) scale(1);
+            }
+
+        }
+
+
+
+            // Все пункты занимают всю ширину панели
+        &__dropdown &__item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            min-width: 0;
+            height: 40px;
+            box-sizing: border-box;
+            padding: 8px 10px;
+
+            font-size: 16px;
+            border-radius: 16px;
+        }
+
+        &__item {
+            // width: auto;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        &__logo {
+            display: flex;
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: 600;
+            color: #242424;
+            cursor: pointer;
+        }
+
+        
+
+        &__desktop {
+            display: none;
+        }
+
+         &__left {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+
+         &__burger {
+            position: relative;
+            z-index: 1002;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+
+            width: 44px;
+            height: 44px;
+            margin-right: 4px;
+            padding: 10px;
+
+            color: #242424;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+
+            span {
+                display: block;
+                width: 24px;
+                height: 2px;
+                background: currentColor;
+                border-radius: 2px;
+                transition: transform 180ms ease, opacity 180ms ease;
+            }
+
+            &--open {
+                span:nth-child(1) {
+                transform: translateY(7px) rotate(45deg);
+                }
+
+                span:nth-child(2) {
+                opacity: 0;
+                }
+
+                span:nth-child(3) {
+                transform: translateY(-7px) rotate(-45deg);
+                }
+            }
+            }
+
+    }
 }
 
 
