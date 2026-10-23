@@ -1,6 +1,6 @@
 import styles from './header.module.scss'
 import type { HeaderItemId } from '../../App.tsx';
-import { useEffect, useState, useRef, type HtmlHTMLAttributes } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 
 type HeaderProps = {
