@@ -9,6 +9,7 @@ interface FolderProps {
   onPointerMove?: React.PointerEventHandler<HTMLButtonElement>,
   onPointerUp?: React.PointerEventHandler<HTMLButtonElement>,
   onPointerCancel?: React.PointerEventHandler<HTMLButtonElement>;
+  onClick?: React.PointerEventHandler<HTMLButtonElement>;
 }
 
 const Folder: React.FC<FolderProps> = ({ 
@@ -19,6 +20,7 @@ const Folder: React.FC<FolderProps> = ({
   onPointerMove,
   onPointerUp,
   onPointerCancel,
+  onClick,
   }) => {
   return (
     <button className={stlyes.folder}  
@@ -29,6 +31,7 @@ const Folder: React.FC<FolderProps> = ({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel} 
+      onClick={onClick}
     >
       <div className={stlyes.folder__icon}>
         <div className={stlyes.folder__tab} />

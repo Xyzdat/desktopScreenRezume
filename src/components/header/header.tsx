@@ -1,6 +1,6 @@
 import styles from './header.module.scss'
 import type { HeaderItemId } from '../../App.tsx';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, type HtmlHTMLAttributes } from 'react';
 
 
 type HeaderProps = {
@@ -20,6 +20,8 @@ const Header = ({onItemClick}: HeaderProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const closeMenu = () => setIsMenuOpen(false);
 
+    const menuRef = useRef<HTMLDivElement>(null);
+
     const handleItemClick = (id: HeaderItemId) => {
         onItemClick(id);
         closeMenu();
@@ -27,16 +29,16 @@ const Header = ({onItemClick}: HeaderProps) => {
 
     useEffect(() => {
         const handleClose = (event: PointerEvent) => {
-            if (event.target === event.currentTarget) {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 closeMenu();
             }
+        }
 
-            window.addEventListener('keydown', handleClose);
+         window.addEventListener('pointerdown', handleClose);
 
             return () => {
-                window.removeEventListener('keydown', handleClose);
+                window.removeEventListener('pointerdown', handleClose);
             };
-        }
     }, [])
 
     return (
@@ -73,6 +75,7 @@ const Header = ({onItemClick}: HeaderProps) => {
                 
                         <>
                         <nav
+                            ref = {menuRef}
                             id="header-dropdown"
                             className={`${styles.header__dropdown} ${
                                 isMenuOpen ? styles['header__dropdown--open'] : ''

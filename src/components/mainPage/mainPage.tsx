@@ -186,7 +186,10 @@ const MainPage: React.FC<MainPageProps> = ({headerItemToOpen, onHeaderItemHandle
         setOpenWindows((current) => current.filter((windowData) => windowData.id !== id));
     };
 
+    const isMobile = window.matchMedia(`(max-width: 700px)`).matches;
+
     const renderFolder = (id: FolderId, name: string) => (
+        
         <Folder
             key={id}
             name={name}
@@ -197,7 +200,8 @@ const MainPage: React.FC<MainPageProps> = ({headerItemToOpen, onHeaderItemHandle
                 touchAction: "none",
                 cursor: dragState.current?.id === id ? "grabbing" : "grab",
             }}
-            onDoubleClick={(event) => handleDoubleClick(id, event)}
+            onClick={isMobile ? (event) => handleDoubleClick(id, event) : undefined}
+            onDoubleClick={!isMobile ? (event) => handleDoubleClick(id, event) : undefined}
             onPointerDown={(event) => handlePointerDown(id, event)}
             onPointerMove={(event) => handlePointerMove(id, event)}
             onPointerUp={() => handlePointerUp(id)}
