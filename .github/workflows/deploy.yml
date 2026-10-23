@@ -35,12 +35,23 @@ jobs:
                     set -eu
 
                     mkdir -p "$HOME/.ssh"
+
+                    # Восстанавливаем приватный ключ из Base64
                     printf '%s' "$VPS_SSH_KEY_B64" | base64 --decode > "$HOME/.ssh/deploy_key"
                     chmod 600 "$HOME/.ssh/deploy_key"
 
-                    echo "Checking private key format..."
+                    # Проверяем, что именно восстановилось
+                    echo "Key file type:"
+                    file "$HOME/.ssh/deploy_key"
+
+                    echo "Key header:"
+                    head -n 1 "$HOME/.ssh/deploy_key"
+
+                    # Проверяем, что OpenSSH может прочитать ключ
+                    echo "Validating key:"
                     ssh-keygen -y -f "$HOME/.ssh/deploy_key" > /dev/null
 
+                    # Если проверка прошла, выполняем деплой
                     rsync -avz --delete \
                         -e "ssh -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
                         dist/ \
