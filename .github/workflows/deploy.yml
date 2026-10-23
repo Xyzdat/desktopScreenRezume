@@ -27,23 +27,26 @@ jobs:
               run: npm run build
             
             - name: Deploy
-              env: 
+              env:
                 VPS_HOST: ${{ secrets.VPS_HOST }}
                 VPS_USER: ${{ secrets.VPS_USER }}
                 VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
               run: |
+                set -eu
+
                 test -n "$VPS_SSH_KEY" || {
-                    echo "VPS_SSH_KEY is empty"
-                    exit 1
-                    }
+                echo "VPS_SSH_KEY is empty"
+                exit 1
+                }
 
-                mkdir -p ~/.ssh
-                printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
-                chmod 600 ~/.ssh/deploy_key
+                mkdir -p "$HOME/.ssh"
+                printf '%s\n' "$VPS_SSH_KEY" > "$HOME/.ssh/deploy_key"
+                chmod 600 "$HOME/.ssh/deploy_key"
 
-                ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null
+                echo "Checking whether the private key can be parsed..."
+                ssh-keygen -y -f "$HOME/.ssh/deploy_key" > /dev/null
 
                 rsync -avz --delete \
-                -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
+                -e "ssh -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
                 dist/ \
                 "$VPS_USER@$VPS_HOST:/var/www/desktopScreenRezume/"
