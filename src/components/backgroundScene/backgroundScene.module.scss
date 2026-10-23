@@ -1,26 +1,21 @@
 .scene {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+
+  z-index: 0;
+  pointer-events: none;
+
+  // Цвет виден, если модель прозрачная или ещё загружается
+  background: #9ebbd7;
+
+  &__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
-    background: #9ebbd7;
-
-    &::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-            135deg,
-            rgba(224, 240, 255, 0.24),
-            rgba(26, 45, 76, 0.13)
-        );
-        pointer-events: none;
-    }
-
-    &__canvas {
-        display: block;
-        width: 100%;
-        height: 100%;
-    }
+  }
 }

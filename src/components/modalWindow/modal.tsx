@@ -123,7 +123,12 @@ const Modal = ({
   if (!isRendered) return null;
 
   return (
-    <div className={`${styles.modal_overlay} ${isClosing ? styles.modal_overlay_closing : ''}`} style={{ zIndex }}>
+    <div className={`${styles.modal_overlay} ${isClosing ? styles.modal_overlay_closing : ''}`} style={{ zIndex }} 
+      onPointerDown={(event) => {
+        if (event.target === event.currentTarget) {
+          handleClose();
+        }
+      }}>
       <section
         ref={modalRef}
         className={`${styles.modal} ${isMaximized ? styles.modal_maximized : ''} ${isMinimized ? styles.modal_minimized : ''} ${isDragging ? styles.modal_dragging : ''} ${isClosing ? styles.modal_closing : styles.modal_enter}`}

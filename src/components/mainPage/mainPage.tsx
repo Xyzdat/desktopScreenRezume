@@ -3,7 +3,6 @@ import { education, experience, projects, skills, personalInfo } from "../../dat
 import mainPageStyle from "./mainPage.module.scss"
 import Folder from "../folder/folder.tsx";
 import Modal from "../modalWindow/modal.tsx";
-import BackgroundCharacter from "../backgroundCharacter/backgroundCharacter.tsx";
 
 const FOLDER_WIDTH = 100;
 const FOLDER_HEIGHT = 90;
@@ -33,10 +32,16 @@ const defaultPositions: FolderPositions = {
     contacts: { x: 600, y: 100 },
 };
 
+type MainPageProps = {
+    headerItemToOpen: FolderId | null
+    onHeaderItemHandled: ()=> void
+}
 
-const MainPage: React.FC = () => {
+
+const MainPage: React.FC<MainPageProps> = ({headerItemToOpen, onHeaderItemHandled}) => {
 
     const [openWindows, setOpenWindows] = useState<DesktopWindow[]>([]);
+
 
     const desktopRef = useRef<HTMLDivElement>(null);
     const nextWindowZIndex = useRef(1000);
@@ -49,6 +54,48 @@ const MainPage: React.FC = () => {
             return defaultPositions;
         }
     });
+
+    
+    useEffect(() => {
+        if (!headerItemToOpen) return
+
+        const id = headerItemToOpen
+        const zIndex = ++nextWindowZIndex.current
+
+        setOpenWindows((current) => {
+            const existingWindow = current.find((windowData) => windowData.id === id)
+
+            // Если окно уже открыто — поднимаем его поверх остальных
+            if (existingWindow) {
+            return current.map((windowData) =>
+                windowData.id === id
+                ? { ...windowData, zIndex }
+                : windowData
+            )
+            }
+
+            // Для окна из хедера берём позицию соответствующей папки
+            const folderPosition = positions[id]
+
+            return [
+            ...current,
+            {
+                id,
+                zIndex,
+                animationOrigin: {
+                x: folderPosition.x + FOLDER_WIDTH / 2,
+                y: folderPosition.y + FOLDER_HEIGHT / 2,
+                },
+                initialPosition: {
+                x: Math.max(24, Math.min(folderPosition.x + 20, window.innerWidth - 624)),
+                y: Math.max(24, Math.min(folderPosition.y + 20, window.innerHeight - 320)),
+                },
+            },
+            ]
+        })
+
+        onHeaderItemHandled();
+    }, [headerItemToOpen, positions, onHeaderItemHandled])
 
     useEffect(() => {
         localStorage.setItem('folder_positions', JSON.stringify(positions));
@@ -160,7 +207,6 @@ const MainPage: React.FC = () => {
 
     return (
         <div className={mainPageStyle.container} ref={desktopRef}>
-            <BackgroundCharacter />
             {renderFolder('experience', 'Опыт работы')}
             {renderFolder('projects', 'Пет проекты')}
             {renderFolder('education', 'Образование')}
