@@ -14,6 +14,7 @@ type DesktopWindow = {
     animationOrigin: FolderPosition;
     initialPosition: FolderPosition;
     zIndex: number;
+    restoreToken: number;
 };
 
 const windowTitles: Record<FolderId, string> = {
@@ -22,6 +23,19 @@ const windowTitles: Record<FolderId, string> = {
     education: 'Образование',
     skills: 'Технический стэк',
     contacts: 'Контакты',
+};
+
+const getWindowPosition = (x: number, y: number): FolderPosition => {
+    const topBoundary = window.matchMedia('(max-width: 700px)').matches ? 76 : 52;
+
+    if (window.matchMedia('(max-width: 700px)').matches) {
+        return { x: 12, y: topBoundary };
+    }
+
+    return {
+        x: Math.max(24, Math.min(x, window.innerWidth - 624)),
+        y: Math.max(topBoundary, Math.min(y, window.innerHeight - 320)),
+    };
 };
 
 const defaultPositions: FolderPositions = {
@@ -44,7 +58,7 @@ const MainPage: React.FC<MainPageProps> = ({headerItemToOpen, onHeaderItemHandle
 
 
     const desktopRef = useRef<HTMLDivElement>(null);
-    const nextWindowZIndex = useRef(1000);
+    const nextWindowZIndex = useRef(10000);
 
     const [positions, setPositions] = useState<FolderPositions>(() => {
         try {
@@ -69,7 +83,7 @@ const MainPage: React.FC<MainPageProps> = ({headerItemToOpen, onHeaderItemHandle
             if (existingWindow) {
             return current.map((windowData) =>
                 windowData.id === id
-                ? { ...windowData, zIndex }
+                ? { ...windowData, zIndex, restoreToken: windowData.restoreToken + 1 }
                 : windowData
             )
             }
@@ -82,14 +96,12 @@ const MainPage: React.FC<MainPageProps> = ({headerItemToOpen, onHeaderItemHandle
             {
                 id,
                 zIndex,
+                restoreToken: 0,
                 animationOrigin: {
                 x: folderPosition.x + FOLDER_WIDTH / 2,
                 y: folderPosition.y + FOLDER_HEIGHT / 2,
                 },
-                initialPosition: {
-                x: Math.max(24, Math.min(folderPosition.x + 20, window.innerWidth - 624)),
-                y: Math.max(24, Math.min(folderPosition.y + 20, window.innerHeight - 320)),
-                },
+                initialPosition: getWindowPosition(folderPosition.x + 20, folderPosition.y + 20),
             },
             ]
         })
@@ -161,16 +173,17 @@ const MainPage: React.FC<MainPageProps> = ({headerItemToOpen, onHeaderItemHandle
         setOpenWindows((current) => {
             const alreadyOpen = current.some((windowData) => windowData.id === id);
             if (alreadyOpen) {
-                return current.map((windowData) => windowData.id === id ? { ...windowData, zIndex } : windowData);
+                return current.map((windowData) => windowData.id === id
+                    ? { ...windowData, zIndex, restoreToken: windowData.restoreToken + 1 }
+                    : windowData);
             }
 
-            const x = Math.max(24, Math.min(rect.left + 20, window.innerWidth - 624));
-            const y = Math.max(24, Math.min(rect.top + 20, window.innerHeight - 320));
             return [...current, {
                 id,
                 zIndex,
+                restoreToken: 0,
                 animationOrigin: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
-                initialPosition: { x, y },
+                initialPosition: getWindowPosition(rect.left + 20, rect.top + 20),
             }];
         });
     }
@@ -186,7 +199,7 @@ const MainPage: React.FC<MainPageProps> = ({headerItemToOpen, onHeaderItemHandle
         setOpenWindows((current) => current.filter((windowData) => windowData.id !== id));
     };
 
-    const isMobile = window.matchMedia(`(max-width: 700px)`).matches;
+    const isMobile = window.matchMedia(`(max-width: 600px)`).matches;
 
     const renderFolder = (id: FolderId, name: string) => (
         
@@ -224,6 +237,7 @@ const MainPage: React.FC<MainPageProps> = ({headerItemToOpen, onHeaderItemHandle
                 title={windowTitles[windowData.id]}
                 animationOrigin={windowData.animationOrigin}
                 initialPosition={windowData.initialPosition}
+                restoreToken={windowData.restoreToken}
                 zIndex={windowData.zIndex}
                 isActive={windowData.zIndex === Math.max(...openWindows.map((item) => item.zIndex))}
                 onBringToFront={() => bringWindowToFront(windowData.id)}

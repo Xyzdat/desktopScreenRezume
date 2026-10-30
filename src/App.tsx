@@ -3,6 +3,7 @@ import MainPage from './components/mainPage/mainPage'
 import TaskPanel from './components/task_panel/taskPanel'
 import BackgroundScene from './components/backgroundScene/backgroundScene'
 import Header from './components/header/header'
+import CustomCursor from './components/customCursor/customCursor'
 import { useState } from 'react'
 
 export type HeaderItemId =
@@ -22,6 +23,7 @@ function App() {
         < MainPage headerItemToOpen={headerItemToOpen} onHeaderItemHandled = {()=> setHeaderItemToOpen(null)} />
         < TaskPanel />
       </main>
+      <CustomCursor />
     </div>
   )
 }

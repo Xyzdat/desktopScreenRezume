@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { Box3, Group, Vector3 } from "three";
 import styles from "./backgroundScene.module.scss";
 
-const MODEL_PATH = "/models/ftm.glb";
+const MODEL_PATH = "/models/late_night_office.glb";
 
 function FullscreenModel() {
   const { scene } = useGLTF(MODEL_PATH);
@@ -36,7 +36,7 @@ function FullscreenModel() {
     const bounds = new Box3().setFromObject(model);
     const center = bounds.getCenter(new Vector3());
     const dimensions = bounds.getSize(new Vector3());
-    const zoom = 3.2;
+    const zoom = 1;
 
     const cameraDistance = 5;
     const fov = 50;
@@ -77,8 +77,8 @@ function FullscreenModel() {
 
   return (
     <group scale={scale} 
-            position={[-center.x * scale + 1.5, -center.y * scale + 1.2, -center.z * scale]}
-            rotation={[0, Math.PI * 1.18, 0]}
+            position={[-center.x * scale, -center.y * scale + 1, -center.z * scale]}
+            rotation={[0, Math.PI * 1, 0]}
     >
         <group ref={groupRef}> 
             <primitive object={model} />

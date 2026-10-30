@@ -11,12 +11,14 @@ interface ModalProps {
   isActive?: boolean;
   zIndex?: number;
   initialPosition?: WindowPosition;
+  restoreToken?: number;
   children: React.ReactNode;
   animationOrigin?: { x: number; y: number } | null;
 }
 
 const ANIMATION_DURATION = 260;
 const VIEWPORT_GAP = 24;
+const getTopBoundary = () => window.matchMedia('(max-width: 700px)').matches ? 76 : 52;
 
 const Modal = ({
   isOpen,
@@ -24,8 +26,9 @@ const Modal = ({
   onClose,
   onBringToFront = () => {},
   isActive = true,
-  zIndex = 1000,
+  zIndex = 11000,
   initialPosition,
+  restoreToken = 0,
   children,
   animationOrigin,
 }: ModalProps) => {
@@ -36,7 +39,7 @@ const Modal = ({
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState<WindowPosition>(() => initialPosition ?? {
     x: Math.max(VIEWPORT_GAP, (window.innerWidth - 600) / 2),
-    y: Math.max(VIEWPORT_GAP, (window.innerHeight - 400) / 2),
+    y: Math.max(getTopBoundary(), (window.innerHeight - 400) / 2),
   });
   const modalRef = useRef<HTMLElement>(null);
   const closeTimer = useRef<number | null>(null);
@@ -48,6 +51,10 @@ const Modal = ({
       setIsClosing(false);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    setIsMinimized(false);
+  }, [restoreToken]);
 
   useEffect(() => () => {
     if (closeTimer.current !== null) window.clearTimeout(closeTimer.current);
@@ -107,10 +114,11 @@ const Modal = ({
 
     const rect = modalElement.getBoundingClientRect();
     const maxX = Math.max(VIEWPORT_GAP, window.innerWidth - rect.width - VIEWPORT_GAP);
-    const maxY = Math.max(VIEWPORT_GAP, window.innerHeight - rect.height - VIEWPORT_GAP);
+    const topBoundary = getTopBoundary();
+    const maxY = Math.max(topBoundary, window.innerHeight - rect.height - VIEWPORT_GAP);
     setPosition({
       x: Math.max(VIEWPORT_GAP, Math.min(event.clientX - drag.offset.x, maxX)),
-      y: Math.max(VIEWPORT_GAP, Math.min(event.clientY - drag.offset.y, maxY)),
+      y: Math.max(topBoundary, Math.min(event.clientY - drag.offset.y, maxY)),
     });
   };
 
@@ -123,7 +131,7 @@ const Modal = ({
   if (!isRendered) return null;
 
   return (
-    <div className={`${styles.modal_overlay} ${isClosing ? styles.modal_overlay_closing : ''}`} style={{ zIndex }} 
+    <div className={`${styles.modal_overlay} ${isMinimized ? styles.modal_overlay_minimized : ''} ${isClosing ? styles.modal_overlay_closing : ''}`} style={{ zIndex }} 
       onPointerDown={(event) => {
         if (event.target === event.currentTarget) {
           handleClose();
