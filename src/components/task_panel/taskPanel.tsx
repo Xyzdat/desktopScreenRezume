@@ -2,7 +2,7 @@ import { useRef, useState, type FC } from 'react'
 import { personalInfo } from '../../data/resume'
 import Modal from '../modalWindow/modal'
 import styles from './taskPanel.module.scss'
-import {Music, Phone} from "lucide-react"
+import {Music} from "lucide-react"
 import { playClickSound } from '../folder/clickSound'
 
 
