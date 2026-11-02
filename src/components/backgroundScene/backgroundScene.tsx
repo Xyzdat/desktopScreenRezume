@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { Box3, Group, Vector3 } from "three";
 import styles from "./backgroundScene.module.scss";
+import { playClickSound } from "../folder/clickSound";
 
 const MODEL_PATH = "/models/late_night_office.glb";
 
@@ -91,8 +92,13 @@ function FullscreenModel() {
 useGLTF.preload(MODEL_PATH);
 
 export default function BackgroundScene() {
+
+  const handleClick = (() => {
+    playClickSound();
+  });
+
   return (
-    <div className={styles.scene} aria-hidden="true">
+    <div className={styles.scene} aria-hidden="true" onClick={handleClick}>
       <Canvas
         className={styles.scene__canvas}
         camera={{ position: [0, 0, 5], fov: 50 }}
