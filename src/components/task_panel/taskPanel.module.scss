@@ -93,11 +93,27 @@
             outline-offset: 3px;
         }
 
+        &_musicOff {
+            color: rgba(36, 36, 36, 0.48);
+            background: rgba(255, 255, 255, 0.48);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
         svg {
             width: 27px;
             height: 27px;
             stroke-width: 1.8;
         }
+    }
+
+    &__musicSlash {
+        position: absolute;
+        width: 34px;
+        height: 2px;
+        border-radius: 2px;
+        background: currentColor;
+        transform: rotate(-48deg);
+        pointer-events: none;
     }
 }
 

@@ -1,6 +1,7 @@
 import styles from './header.module.scss'
 import type { HeaderItemId } from '../../App.tsx';
 import { useEffect, useState, useRef } from 'react';
+import { playClickSound } from '../folder/clickSound.ts';
 
 
 type HeaderProps = {
@@ -47,7 +48,7 @@ const Header = ({onItemClick}: HeaderProps) => {
             
             <div className={styles.header__desktop}>
                 {items.map((item) => (
-                    <button className={styles.header__item} key={item.id} onClick={() => onItemClick(item.id)}>{item.title}</button>
+                    <button className={styles.header__item} key={item.id} onClick={() => {onItemClick(item.id); playClickSound()}}>{item.title}</button>
                 )) }
             </div>
 

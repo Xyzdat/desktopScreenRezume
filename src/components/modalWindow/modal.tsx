@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { playFolderClickSound } from '../folder/clickSound';
 import styles from './modal.module.scss';
 
 type WindowPosition = { x: number; y: number };
@@ -153,13 +154,14 @@ const Modal = ({
           onPointerCancel={handleHeaderPointerUp}
         >
           <div className={styles.modal__controls} aria-label="Кнопки управления окном">
-            <button className={`${styles.modal__control} ${styles.modal__control_close}`} type="button" aria-label="Закрыть окно" title="Закрыть" onClick={handleClose}>
+            <button className={`${styles.modal__control} ${styles.modal__control_close}`} type="button" aria-label="Закрыть окно" title="Закрыть" onClick={() => { playFolderClickSound(); handleClose(); }}>
               <span aria-hidden="true">×</span>
             </button>
-            <button className={`${styles.modal__control} ${styles.modal__control_minimize}`} type="button" aria-label={isMinimized ? 'Развернуть окно' : 'Свернуть окно'} title={isMinimized ? 'Развернуть' : 'Свернуть'} onClick={() => setIsMinimized((value) => !value)}>
+            <button className={`${styles.modal__control} ${styles.modal__control_minimize}`} type="button" aria-label={isMinimized ? 'Развернуть окно' : 'Свернуть окно'} title={isMinimized ? 'Развернуть' : 'Свернуть'} onClick={() => { playFolderClickSound(); setIsMinimized((value) => !value); }}>
               <span aria-hidden="true">−</span>
             </button>
             <button className={`${styles.modal__control} ${styles.modal__control_maximize}`} type="button" aria-label={isMaximized ? 'Восстановить размер окна' : 'Развернуть на весь экран'} title={isMaximized ? 'Восстановить' : 'Развернуть'} onClick={() => {
+              playFolderClickSound();
               if (isMinimized) setIsMinimized(false);
               setIsMaximized((value) => !value);
             }}>

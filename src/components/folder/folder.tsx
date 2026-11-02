@@ -1,5 +1,6 @@
 import React from "react";
 import stlyes from "./folder.module.scss"
+import { playFolderClickSound } from "./clickSound";
 
 interface FolderProps {
   name?: string,
@@ -9,7 +10,7 @@ interface FolderProps {
   onPointerMove?: React.PointerEventHandler<HTMLButtonElement>,
   onPointerUp?: React.PointerEventHandler<HTMLButtonElement>,
   onPointerCancel?: React.PointerEventHandler<HTMLButtonElement>;
-  onClick?: React.PointerEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const Folder: React.FC<FolderProps> = ({ 
@@ -22,6 +23,11 @@ const Folder: React.FC<FolderProps> = ({
   onPointerCancel,
   onClick,
   }) => {
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+    playFolderClickSound();
+    onClick?.(event);
+  };
+
   return (
     <button className={stlyes.folder}  
       type="button"
@@ -31,7 +37,7 @@ const Folder: React.FC<FolderProps> = ({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel} 
-      onClick={onClick}
+      onClick={handleClick}
     >
       <div className={stlyes.folder__icon}>
         <div className={stlyes.folder__tab} />

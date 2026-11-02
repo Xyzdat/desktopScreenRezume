@@ -5,6 +5,7 @@ import BackgroundScene from './components/backgroundScene/backgroundScene'
 import Header from './components/header/header'
 import CustomCursor from './components/customCursor/customCursor'
 import { useState } from 'react'
+import { playClickSound } from './components/folder/clickSound'
 
 export type HeaderItemId =
   | 'experience'
